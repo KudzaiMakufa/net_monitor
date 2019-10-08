@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="commons-logging-1.2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/pdfbox/commons-logging-1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/pdfbox/fontbox-2.0.17.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/pdfbox/pdfbox-2.0.17.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

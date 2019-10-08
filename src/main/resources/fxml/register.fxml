@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.Pane?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.202-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.netmonitor.controller.Register">
+   <children>
+      <Button fx:id="btnregister" layoutX="264.0" layoutY="312.0" mnemonicParsing="false" onAction="#Register" text="Register" />
+      <Label layoutX="112.0" layoutY="106.0" text="Email" />
+      <TextField fx:id="txtemail" layoutX="281.0" layoutY="101.0" prefHeight="26.0" prefWidth="201.0" />
+      <Label layoutX="112.0" layoutY="157.0" text="Password" />
+      <PasswordField fx:id="txtpassword" layoutX="281.0" layoutY="152.0" prefHeight="26.0" prefWidth="201.0" />
+      <Label layoutX="112.0" layoutY="257.0" text="Phone Number" />
+      <TextField fx:id="phone_number" layoutX="281.0" layoutY="252.0" prefHeight="26.0" prefWidth="201.0" />
+      <PasswordField fx:id="txtconfirm" layoutX="281.0" layoutY="208.0" prefHeight="26.0" prefWidth="195.0" />
+      <Label layoutX="112.0" layoutY="213.0" text="Confirm" />
+   </children>
+</Pane>

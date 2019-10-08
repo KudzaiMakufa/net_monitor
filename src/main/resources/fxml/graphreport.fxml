@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="504.0" prefWidth="732.0" xmlns="http://javafx.com/javafx/8.0.202-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.netmonitor.controller.Report">
+   <children>
+      <LineChart layoutX="28.0" layoutY="14.0" prefHeight="400.0" prefWidth="600.0">
+        <xAxis>
+          <CategoryAxis fx:id="CatergoryAxis" side="BOTTOM" />
+        </xAxis>
+        <yAxis>
+          <NumberAxis fx:id="NumberAxis" side="LEFT" />
+        </yAxis>
+      </LineChart>
+      <Label layoutX="68.0" layoutY="422.0" text="Expected" />
+      <Label fx:id="txtexpected" layoutX="185.0" layoutY="422.0" text="0" />
+      <Label layoutX="241.0" layoutY="422.0" text="Actual" />
+      <Label fx:id="txtactual" layoutX="348.0" layoutY="422.0" text="0" />
+      <Label layoutX="578.0" layoutY="422.0" text="Variance" />
+      <Label fx:id="txtvariance" layoutX="682.0" layoutY="422.0" text="0" />
+      <Label layoutX="205.0" layoutY="461.0" text="Total Loss" />
+      <Label fx:id="txtloss" layoutX="348.0" layoutY="461.0" text="0" />
+      <Button fx:id="btncalculate" layoutX="437.0" layoutY="456.0" mnemonicParsing="false" onAction="#Calculate" text="Calculate" />
+   </children>
+</AnchorPane>

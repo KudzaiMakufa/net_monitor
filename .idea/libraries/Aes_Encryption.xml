@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Aes_Encryption">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/lib/Aes_Encryption" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/Aes_Encryption" recursive="false" />
+  </library>
+</component>
