@@ -24,6 +24,7 @@ public class Report {
 
 
     public void Calculate(ActionEvent event){
+
         //get expected from database
         Plan plan = new Plan();
         String speed = plan.GetSpeed();
@@ -55,10 +56,7 @@ public class Report {
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-//                        1 =  1048576;
-//                        13 *1 = bits
 //
-//                       System.out.println(report.getTransferRateBit() - BigDecimal.valueOf(13));
                         txtactual.setText(report.getTransferRateBit()+" b/s");
                     }
                 });

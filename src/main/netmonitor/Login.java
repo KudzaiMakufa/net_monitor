@@ -72,7 +72,7 @@ public class Login extends Application {
                 root = FXMLLoader.load(dashboard);
                 Stage stage = new Stage();
                 stage.setTitle("Dashboard");
-                stage.setScene(new Scene(root, 715, 451));
+                stage.setScene(new Scene(root, 934, 451));
                 stage.show();
                 // Hide this current window (if this is what you want)
                 ((Node) (event.getSource())).getScene().getWindow().hide();

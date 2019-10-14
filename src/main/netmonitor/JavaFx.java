@@ -30,6 +30,7 @@ public class JavaFx extends Application {
 
 		primaryStage.setTitle("Sniffer");
 		// primaryStage.setScene(new Scene(interfaces));
+
 		primaryStage.setScene(new Scene(main)); //
 		primaryStage.show();
 	}

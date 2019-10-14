@@ -42,21 +42,10 @@ public class Register {
         if (validator.isValidEmailAddress(txtemail.getText()) && txtpassword.getText().toString().equals(txtconfirm.getText().toString())) {
             Users user = new Users();
             if (user.InsertUser(txtemail.getText().toString(), phone_number.getText().toString(), txtpassword.getText().toString())) {
-
+                Alerts alert = new Alerts();
+                alert.Information("Success","Accounted created "," account with email "+txtemail.getText()+" added");
                 ((Node) (event.getSource())).getScene().getWindow().hide();
-//                Parent root;
-//                try {
-//                    URL dashboard = new File("src/main/resources/fxml/register.fxml").toURI().toURL();
-//                    root = FXMLLoader.load(dashboard);
-//                    Stage stage = new Stage();
-//                    stage.setTitle("Dashboard");
-//                    stage.setScene(new Scene(root, 900, 600));
-//                    stage.show();
-//                    // Hide this current window (if this is what you want)
-//                    ((Node) (event.getSource())).getScene().getWindow().hide();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
+//
 
             }
         } else {

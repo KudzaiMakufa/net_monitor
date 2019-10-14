@@ -1,5 +1,9 @@
 package main.netmonitor.controller;
 
+import fr.bmartel.speedtest.SpeedTestReport;
+import fr.bmartel.speedtest.SpeedTestSocket;
+import fr.bmartel.speedtest.inter.ISpeedTestListener;
+import fr.bmartel.speedtest.model.SpeedTestError;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -19,6 +23,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import main.netmonitor.model.Tables.Plan;
 import org.jnetpcap.Pcap;
 import org.jnetpcap.PcapIf;
 import org.jnetpcap.packet.PcapPacket;
@@ -39,6 +44,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -63,8 +69,11 @@ public class ControllerMain implements Initializable {
 	@FXML
 	private MenuItem graphreport ;
 
+    @FXML Label txtexpected ;
+    @FXML Label txtactual ;
+    @FXML Label txtvariance ;
 
-	@FXML
+    @FXML
 	private MenuItem flitters;
 	@FXML
 	private ListView<PcapPacket> listPackets;//
@@ -145,7 +154,7 @@ public class ControllerMain implements Initializable {
 // Here is the overall stage of the hardware view... and then stuffed a scene inside. This scene is the one we just loaded
 		final Stage stageInterface = new Stage();
 		stageInterface.setScene(new Scene(interfaces));
-		stageInterface.setTitle("选择网络设备");
+		stageInterface.setTitle("Select network device");
 
 // Below is the setting for selecting the view of the filtering protocOL
 		Parent flitter = null;
@@ -158,7 +167,7 @@ public class ControllerMain implements Initializable {
 // Here is the stag that selects the filter protocol type.e
 		final Stage stageFlitter = new Stage();
 		stageFlitter.setScene(new Scene(flitter));
-		stageFlitter.setTitle("选择筛选协议");
+		stageFlitter.setTitle("Select screening protocol");
 		CtrlFlitter = fxmlLoaderFlitter.getController();
 
 // Get the controller of the view
@@ -293,7 +302,7 @@ public class ControllerMain implements Initializable {
 					URL dashboard = new File("src/main/resources/fxml/userslist.fxml").toURI().toURL();
 					root = FXMLLoader.load(dashboard);
 					Stage stage = new Stage();
-					stage.setTitle("LIsting Users");
+					stage.setTitle("Listing Users");
 					stage.setScene(new Scene(root, 600, 400));
 					stage.show();
 					// Hide this current window (if this is what you want)
@@ -307,22 +316,25 @@ public class ControllerMain implements Initializable {
 		graphreport.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(javafx.event.ActionEvent event) {
-				Parent root;
-				try {
-					URL dashboard = new File("src/main/resources/fxml/graphreport.fxml").toURI().toURL();
-					root = FXMLLoader.load(dashboard);
-					Stage stage = new Stage();
-					stage.setTitle("Intenet Plan");
-					stage.setScene(new Scene(root, 732, 504));
-					stage.show();
-					// Hide this current window (if this is what you want)
-					//((Node) (event.getSource())).getScene().getWindow().hide();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			    GraphReport.main(null);
+
+
+//				Parent root;
+//				try {
+//					URL dashboard = new File("src/main/resources/fxml/graphreport.fxml").toURI().toURL();
+//					root = FXMLLoader.load(dashboard);
+//					Stage stage = new Stage();
+//					stage.setTitle("Intenet Plan");
+//					stage.setScene(new Scene(root, 732, 504));
+//					stage.show();
+//					// Hide this current window (if this is what you want)
+//					//((Node) (event.getSource())).getScene().getWindow().hide();
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//				}
 			}
 		});
-		//setting interface fro adding user
+		//setting interface for adding user
 		AddUser.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(javafx.event.ActionEvent event) {
@@ -331,7 +343,7 @@ public class ControllerMain implements Initializable {
 					URL dashboard = new File("src/main/resources/fxml/register.fxml").toURI().toURL();
 					root = FXMLLoader.load(dashboard);
 					Stage stage = new Stage();
-					stage.setTitle("Intenet Plan");
+					stage.setTitle("Add User");
 					stage.setScene(new Scene(root, 600, 400));
 					stage.show();
 					// Hide this current window (if this is what you want)
@@ -419,6 +431,67 @@ public class ControllerMain implements Initializable {
 			}
 		});
 	}
+	//btn click action
+
+
+    public void Calculate(ActionEvent event){
+
+        //get expected from database
+        Plan plan = new Plan();
+        String speed = plan.GetSpeed();
+        String price = plan.GetPrice();
+
+        //JSPEEDTEST HERE
+        SpeedTestSocket speedTestSocket = new SpeedTestSocket();
+
+// add a listener to wait for speedtest completion and progress
+        speedTestSocket.addSpeedTestListener(new ISpeedTestListener() {
+
+
+
+            @Override
+            public void onCompletion(SpeedTestReport report) {
+                // called when download/upload is complete
+                System.out.println("[COMPLETED] rate in octet/s : " + report.getTransferRateOctet());
+                System.out.println("[COMPLETED] rate in bit/s   : " + report.getTransferRateBit());
+            }
+
+            @Override
+            public void onError(SpeedTestError speedTestError, String errorMessage) {
+                // called when a download/upload error occur
+            }
+
+            @Override
+            public void onProgress(float percent, SpeedTestReport report) {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        DecimalFormat df = new DecimalFormat("#.####");
+                        double bitz = report.getTransferRateBit().doubleValue();
+                        System.out.println(bitz/1e+6);
+                       // txtexpected.setText(Double.toString(bitz/1e+6));
+//
+                        txtactual.setText(df.format(bitz/1e+6)+" m/s");
+
+                        txtvariance.setText("$ " +Double.toString(Double.parseDouble(df.format(Double.valueOf(price)*(Double.valueOf(speed) - (bitz/1e+6))   ))));
+
+                    }
+                });
+
+                // called to notify download/upload progress
+                System.out.println("[PROGRESS] progress : " + percent + "%");
+                System.out.println("[PROGRESS] rate in octet/s : " + report.getTransferRateOctet());
+                System.out.println("[PROGRESS] rate in bit/s   : " + report.getTransferRateBit());
+            }
+        });
+        speedTestSocket.startDownload("http://ipv4.ikoula.testdebit.info/1M.iso", 1500);
+
+        txtexpected.setText(speed+" mb/s");
+        //calculating variance
+
+        System.out.println(price);
+
+    }
 
 
 	public synchronized void flitterChanged() {

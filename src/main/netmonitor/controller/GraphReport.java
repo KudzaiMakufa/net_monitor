@@ -12,6 +12,7 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
 import java.text.SimpleDateFormat;
@@ -34,6 +35,7 @@ public class GraphReport extends Application {
     private XYChart.Series xySeries2;
     private CategoryAxis xAxis;
     private int lastObservedSize;
+
 
     @Override public void start(Stage stage) {
 
@@ -93,6 +95,8 @@ public class GraphReport extends Application {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(task);
 
+        Label lab = new Label();
+
         Scene scene  = new Scene(lineChart,800,600);
 
         xAxis.setCategories(myXaxisCategories);
@@ -116,7 +120,9 @@ public class GraphReport extends Application {
         });
     }
 
+
+
     public static void main(String[] args) {
-        launch(args);
+       launch(args);
     }
 }
