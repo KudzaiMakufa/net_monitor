@@ -35,13 +35,14 @@ public class Register {
     PasswordField txtconfirm;
 
 
-    public void Register(Event event) {
+    public void Register(Event event) throws Exception {
         System.out.println(txtpassword.getText());
         System.out.println(txtconfirm.getText());
 
         if (validator.isValidEmailAddress(txtemail.getText()) && txtpassword.getText().toString().equals(txtconfirm.getText().toString())) {
             Users user = new Users();
-            if (user.InsertUser(txtemail.getText().toString(), phone_number.getText().toString(), txtpassword.getText().toString())) {
+            Aes aes = new Aes();
+            if (user.InsertUser(txtemail.getText().toString(), phone_number.getText().toString(),"user", aes.encrypt(txtpassword.getText().toString()))) {
                 Alerts alert = new Alerts();
                 alert.Information("Success","Accounted created "," account with email "+txtemail.getText()+" added");
                 ((Node) (event.getSource())).getScene().getWindow().hide();
@@ -53,11 +54,10 @@ public class Register {
                 Alerts alert = new Alerts();
                 alert.Warning("Warning","Failed to register","Invalid email address or passwords did not match");
 
-
-
         }
 
     }
+
 }
 
 

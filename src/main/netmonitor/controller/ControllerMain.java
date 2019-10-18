@@ -24,6 +24,8 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import main.netmonitor.model.Tables.Plan;
+import main.netmonitor.model.Tables.Reports;
+import main.netmonitor.validation.Alerts;
 import org.jnetpcap.Pcap;
 import org.jnetpcap.PcapIf;
 import org.jnetpcap.packet.PcapPacket;
@@ -50,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.prefs.Preferences;
 
 public class ControllerMain implements Initializable {
 	@FXML
@@ -316,40 +319,54 @@ public class ControllerMain implements Initializable {
 		graphreport.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(javafx.event.ActionEvent event) {
-			    GraphReport.main(null);
+				if (UserSession.getMyVariable() == "admin") {
+					//GraphReport.main(null);
 
 
-//				Parent root;
-//				try {
-//					URL dashboard = new File("src/main/resources/fxml/graphreport.fxml").toURI().toURL();
-//					root = FXMLLoader.load(dashboard);
-//					Stage stage = new Stage();
-//					stage.setTitle("Intenet Plan");
-//					stage.setScene(new Scene(root, 732, 504));
-//					stage.show();
-//					// Hide this current window (if this is what you want)
-//					//((Node) (event.getSource())).getScene().getWindow().hide();
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//				}
+					Parent root;
+					try {
+						URL dashboard = new File("src/main/resources/fxml/graphfinal.fxml").toURI().toURL();
+						root = FXMLLoader.load(dashboard);
+						Stage stage = new Stage();
+						stage.setTitle("Internet Graph");
+						stage.setScene(new Scene(root, 934, 451));
+						stage.show();
+						// Hide this current window (if this is what you want)
+						//((Node) (event.getSource())).getScene().getWindow().hide();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				else{
+					Alerts alert = new Alerts();
+					alert.Information("Warning","Access Control","You are not allowed to view Users");
+				}
 			}
+
 		});
 		//setting interface for adding user
 		AddUser.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(javafx.event.ActionEvent event) {
-				Parent root;
-				try {
-					URL dashboard = new File("src/main/resources/fxml/register.fxml").toURI().toURL();
-					root = FXMLLoader.load(dashboard);
-					Stage stage = new Stage();
-					stage.setTitle("Add User");
-					stage.setScene(new Scene(root, 600, 400));
-					stage.show();
-					// Hide this current window (if this is what you want)
-					//((Node) (event.getSource())).getScene().getWindow().hide();
-				} catch (IOException e) {
-					e.printStackTrace();
+
+				if (UserSession.getMyVariable() == "admin")
+				{
+					Parent root;
+					try {
+						URL dashboard = new File("src/main/resources/fxml/register.fxml").toURI().toURL();
+						root = FXMLLoader.load(dashboard);
+						Stage stage = new Stage();
+						stage.setTitle("Add User");
+						stage.setScene(new Scene(root, 600, 400));
+						stage.show();
+						// Hide this current window (if this is what you want)
+						//((Node) (event.getSource())).getScene().getWindow().hide();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}else{
+					Alerts alert = new Alerts();
+					alert.Information("Warning","Access Control","You are not allowed to add Users");
 				}
 			}
 		});
@@ -466,14 +483,19 @@ public class ControllerMain implements Initializable {
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
+
                         DecimalFormat df = new DecimalFormat("#.####");
                         double bitz = report.getTransferRateBit().doubleValue();
                         System.out.println(bitz/1e+6);
                        // txtexpected.setText(Double.toString(bitz/1e+6));
 //
                         txtactual.setText(df.format(bitz/1e+6)+" m/s");
+                        String variance = Double.toString(Double.parseDouble(df.format(Double.valueOf(price)*(Double.valueOf(speed) - (bitz/1e+6))   )));
+                        txtvariance.setText("$ " +variance);
 
-                        txtvariance.setText("$ " +Double.toString(Double.parseDouble(df.format(Double.valueOf(price)*(Double.valueOf(speed) - (bitz/1e+6))   ))));
+                        //sending to data base with 10 sec delay
+						Reports report = new Reports();
+						report.Insert(variance,"date");
 
                     }
                 });
@@ -488,7 +510,6 @@ public class ControllerMain implements Initializable {
 
         txtexpected.setText(speed+" mb/s");
         //calculating variance
-
         System.out.println(price);
 
     }

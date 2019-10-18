@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="csvreader">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/lib/csvreader" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/csvreader" recursive="false" />
+  </library>
+</component>

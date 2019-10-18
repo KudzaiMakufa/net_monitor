@@ -1,128 +1,121 @@
 package main.netmonitor.controller;
 
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Label;
 import javafx.stage.Stage;
+import main.netmonitor.encryption.Aes;
+import main.netmonitor.model.Tables.Plan;
 
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Random;
-import java.util.concurrent.ExecutorService;
+import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 
-public class GraphReport extends Application {
-
-    ObservableList<XYChart.Data<String, Integer>> xyList1 = FXCollections.observableArrayList();
-    ObservableList<XYChart.Data<String, Integer>> xyList2 = FXCollections.observableArrayList();
-
-    ObservableList<String> myXaxisCategories = FXCollections.observableArrayList();
-
-    int i;
-    private Task<Date> task;
-    private LineChart<String,Number> lineChart;
-    private XYChart.Series xySeries1;
-    private XYChart.Series xySeries2;
-    private CategoryAxis xAxis;
-    private int lastObservedSize;
+public class GraphReport implements Initializable {
+    @FXML NumberAxis yAxis ;
+    @FXML
+    CategoryAxis xAxis ;
+    @FXML public LineChart <String, Number> lineChart ;
+    final int WINDOW_SIZE = 10;
+    private ScheduledExecutorService scheduledExecutorService;
 
 
-    @Override public void start(Stage stage) {
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        xyList1.addListener((ListChangeListener<XYChart.Data<String, Integer>>) change -> {
-            if (change.getList().size() - lastObservedSize > 10) {
-                lastObservedSize += 10;
-                xAxis.getCategories().remove(0, 10);
-            }
-        });
+        //defining the axes
+//        final CategoryAxis xAxis = new CategoryAxis(); // we are gonna plot against time
+//        final NumberAxis yAxis = new NumberAxis();
+        xAxis.setLabel("Time/s");
+        xAxis.setAnimated(false); // axis animations are removed
+        yAxis.setLabel("Speed");
+        yAxis.setAnimated(false); // axis animations are removed
 
-        stage.setTitle("Bandwidth Real Time Update");
-        xAxis = new CategoryAxis();
-        xAxis.setLabel("Time");
+        //creating the line chart with two axis created above
+        //final LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
+        lineChart.setTitle("Graph Report ");
+        lineChart.setAnimated(false); // disable animations
 
-        final NumberAxis yAxis = new NumberAxis();
-        lineChart = new LineChart<>(xAxis,yAxis);
+        //defining a series to display data
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Actual");
 
-        lineChart.setTitle("Bandwidth Real Time Update");
-        lineChart.setAnimated(false);
+        XYChart.Series<String, Number> series1 = new XYChart.Series<>();
+        series1.setName("Expected");
 
-        task = new Task<Date>() {
-            @Override
-            protected Date call() throws Exception {
-                while (true) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException iex) {
-                        Thread.currentThread().interrupt();
-                    }
+        // add series to chart
+        lineChart.getData().add(series);
+        lineChart.getData().add(series1);
 
-                    if (isCancelled()) {
-                        break;
-                    }
+        // this is used to display time in HH:mm:ss format
+        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
 
-                    updateValue(new Date());
+        // setup a scheduled executor to periodically put data into the chart
+        scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        final int[] count = {1};
+        // put dummy data onto graph per second
+        scheduledExecutorService.scheduleAtFixedRate(() -> {
+            // get a random integer between 0-10
+            Integer random = ThreadLocalRandom.current().nextInt(10);
+
+            // Update the chart
+            Platform.runLater(() -> {
+                // get current time
+                Date now = new Date();
+
+                Connection c = null;
+                Statement stmt = null;
+
+
+                try {
+
+                    Class.forName("org.sqlite.JDBC");
+                    c = DriverManager.getConnection("jdbc:sqlite:netmonitor.db");
+                    c.setAutoCommit(false);
+                    // System.out.println("Opened database successfully");
+                    stmt = c.createStatement();
+
+
+                    ResultSet rs = stmt.executeQuery( "SELECT * FROM Reports WHERE  ID='"+ count[0] +"';");
+                    Plan plan = new Plan();
+                    String speed = plan.GetSpeed();
+                    count[0]++ ;
+                    series.getData().add(new XYChart.Data<>(simpleDateFormat.format(now), rs.getInt("loss")));
+                    series1.getData().add(new XYChart.Data<>(simpleDateFormat.format(now),5));
+                    if (series1.getData().size() > WINDOW_SIZE)
+                        series1.getData().remove(0);
+                    if (series.getData().size() > WINDOW_SIZE)
+                        series.getData().remove(0);
+
+                    rs.close();
+                    stmt.close();
+                    c.close();
+                } catch ( Exception e ) {
+                    System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+                    System.exit(0);
                 }
-                return new Date();
-            }
-        };
 
-        task.valueProperty().addListener(new ChangeListener<Date>() {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-            Random random = new Random();
+                // put random number with current time
 
-            @Override
-            public void changed(ObservableValue<? extends Date> observableValue, Date oldDate, Date newDate) {
 
-                String strDate = dateFormat.format(newDate);
-                myXaxisCategories.add(strDate);
-
-                xyList1.add(new XYChart.Data(strDate, 6000));
-                xyList2.add(new XYChart.Data(strDate, Integer.valueOf(newDate.getMinutes() + random.nextInt(6000) - random.nextInt(500))));
-
-            }
-        });
-
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.submit(task);
-
-        Label lab = new Label();
-
-        Scene scene  = new Scene(lineChart,800,600);
-
-        xAxis.setCategories(myXaxisCategories);
-//        xAxis.setAutoRanging(false);
-
-        xySeries1 = new XYChart.Series(xyList1);
-        xySeries1.setName("Expected Bandwidth");
-
-        xySeries2 = new XYChart.Series(xyList2);
-        xySeries2.setName("Actual Bandwidth");
-
-        lineChart.getData().addAll(xySeries1, xySeries2);
-
-        i = 0;
-
-        stage.setScene(scene);
-        stage.show();
-
-        stage.setOnCloseRequest(windowEvent -> {
-            task.cancel();
-        });
+            });
+        }, 0, 1, TimeUnit.SECONDS);
     }
 
 
-
-    public static void main(String[] args) {
-       launch(args);
-    }
 }

@@ -12,6 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import main.netmonitor.controller.UserSession;
 import main.netmonitor.encryption.Aes;
 import main.netmonitor.model.Tables.Users;
 import main.netmonitor.validation.Alerts;
@@ -20,6 +21,7 @@ import main.netmonitor.validation.EmailValidation;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.prefs.Preferences;
 
 public class Login extends Application {
     EmailValidation validator = new EmailValidation();
@@ -48,7 +50,7 @@ public class Login extends Application {
                 String encrypted = aes.encrypt(txtpassword.getText().toString());
 
                 //method to compare with stored value here
-                System.out.println(users.InsertUser(txtemail.getText(), txtemail.getText(), encrypted));
+                System.out.println(users.InsertUser(txtemail.getText(), txtemail.getText(), "user",encrypted));
 
 
             } catch (Exception e) {
@@ -63,9 +65,26 @@ public class Login extends Application {
 
     if( validator.isValidEmailAddress(txtemail.getText())) {
         Users user = new Users();
-        if (user.Login(txtemail.getText().toString(), txtpassword.getText().toString())) {
+        System.out.println(user.Login(txtemail.getText().toString(), txtpassword.getText().toString()));
+        if (user.Login(txtemail.getText().toString(), txtpassword.getText().toString()).equals("admin") ) {
+            UserSession.setMyVariable("admin");
 
+            Parent root;
+            try {
+                URL dashboard = new File("src/main/resources/fxml/main.fxml").toURI().toURL();
+                root = FXMLLoader.load(dashboard);
+                Stage stage = new Stage();
+                stage.setTitle("Dashboard");
+                stage.setScene(new Scene(root, 934, 451));
+                stage.show();
+                // Hide this current window (if this is what you want)
+                ((Node) (event.getSource())).getScene().getWindow().hide();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
+        }
+        else if (user.Login(txtemail.getText().toString(), txtpassword.getText().toString()).equals("user")) {
             Parent root;
             try {
                 URL dashboard = new File("src/main/resources/fxml/main.fxml").toURI().toURL();

@@ -5,17 +5,18 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="1.8" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="javafx-base-11-linux" level="project" />
-    <orderEntry type="library" name="commons-net-3.6" level="project" />
-    <orderEntry type="library" name="commons-logging-1.2" level="project" />
-    <orderEntry type="library" name="jnetpcap" level="project" />
-    <orderEntry type="library" name="Aes_Encryption" level="project" />
-    <orderEntry type="library" name="javafx-base-11-linux (2)" level="project" />
-    <orderEntry type="library" name="sqlite" level="project" />
-    <orderEntry type="library" name="javafx" level="project" />
+    <orderEntry type="library" exported="" name="commons-net-3.6" level="project" />
+    <orderEntry type="library" exported="" name="commons-logging-1.2" level="project" />
+    <orderEntry type="library" exported="" name="jnetpcap" level="project" />
+    <orderEntry type="library" exported="" name="Aes_Encryption" level="project" />
+    <orderEntry type="library" exported="" name="javafx-base-11-linux (2)" level="project" />
+    <orderEntry type="library" exported="" name="sqlite" level="project" />
+    <orderEntry type="library" exported="" name="javafx" level="project" />
     <orderEntry type="library" name="Unirest" level="project" />
     <orderEntry type="library" name="volley" level="project" />
+    <orderEntry type="library" name="csvreader" level="project" />
   </component>
 </module>
