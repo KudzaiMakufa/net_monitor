@@ -8,6 +8,7 @@ public class Reports {
     Connection c = null;
     Statement stmt = null;
     Boolean inserted = false ;
+    Boolean deleted = false ;
     public  boolean Insert(String loss,String time)
     {
 
@@ -26,6 +27,29 @@ public class Reports {
             c.close();
             inserted = true ;
             return inserted ;
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        return inserted ;
+    }
+    public  boolean Truncate()
+    {
+
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:netmonitor.db");
+            c.setAutoCommit(false);
+            System.out.println("Opened database successfully");
+            stmt = c.createStatement();
+
+            String sql = "DELETE FROM Reports;";
+            stmt.executeUpdate(sql);
+            stmt.close();
+            c.commit();
+            c.close();
+            deleted = true ;
+            return deleted ;
         } catch ( Exception e ) {
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
             System.exit(0);

@@ -4,6 +4,8 @@ import fr.bmartel.speedtest.SpeedTestReport;
 import fr.bmartel.speedtest.SpeedTestSocket;
 import fr.bmartel.speedtest.inter.ISpeedTestListener;
 import fr.bmartel.speedtest.model.SpeedTestError;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -23,6 +25,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import main.netmonitor.model.Tables.Plan;
 import main.netmonitor.model.Tables.Reports;
 import main.netmonitor.validation.Alerts;
@@ -52,9 +55,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.prefs.Preferences;
 
 public class ControllerMain implements Initializable {
+
 	@FXML
 	private MenuBar menuBar;
 	@FXML
@@ -114,6 +121,7 @@ public class ControllerMain implements Initializable {
 	FXMLLoader fxmlLoaderInterface;
 	FXMLLoader fxmlLoaderFlitter;
 
+	private ScheduledExecutorService scheduledExecutorService;
 	ControllerInterface CtrlInterf;
 	ControllerFlitter CtrlFlitter;
 	Stage stage = null;
@@ -451,68 +459,100 @@ public class ControllerMain implements Initializable {
 	//btn click action
 
 
-    public void Calculate(ActionEvent event){
+    public void Calculate(ActionEvent event) {
 
-        //get expected from database
-        Plan plan = new Plan();
-        String speed = plan.GetSpeed();
-        String price = plan.GetPrice();
+		//wipe Report database
+		Reports reports = new Reports();
+		if(reports.Truncate())
+		{
 
-        //JSPEEDTEST HERE
-        SpeedTestSocket speedTestSocket = new SpeedTestSocket();
+				//get expected from database
+				Plan plan = new Plan();
+				String speed = plan.GetSpeed();
+				String price = plan.GetPrice();
 
-// add a listener to wait for speedtest completion and progress
-        speedTestSocket.addSpeedTestListener(new ISpeedTestListener() {
+				//JSPEEDTEST HERE
+				SpeedTestSocket speedTestSocket = new SpeedTestSocket();
+
+		// add a listener to wait for speedtest completion and progress
+				speedTestSocket.addSpeedTestListener(new ISpeedTestListener() {
 
 
+					@Override
+					public void onCompletion(SpeedTestReport report) {
+						// called when download/upload is complete
+						System.out.println("[COMPLETED] rate in octet/s : " + report.getTransferRateOctet());
+						System.out.println("[COMPLETED] rate in bit/s   : " + report.getTransferRateBit());
+					}
 
-            @Override
-            public void onCompletion(SpeedTestReport report) {
-                // called when download/upload is complete
-                System.out.println("[COMPLETED] rate in octet/s : " + report.getTransferRateOctet());
-                System.out.println("[COMPLETED] rate in bit/s   : " + report.getTransferRateBit());
-            }
+					@Override
+					public void onError(SpeedTestError speedTestError, String errorMessage) {
+						// called when a download/upload error occur
+					}
 
-            @Override
-            public void onError(SpeedTestError speedTestError, String errorMessage) {
-                // called when a download/upload error occur
-            }
+					int count = 0;
 
-            @Override
-            public void onProgress(float percent, SpeedTestReport report) {
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
+					@Override
+					public void onProgress(float percent, SpeedTestReport report) {
 
-                        DecimalFormat df = new DecimalFormat("#.####");
-                        double bitz = report.getTransferRateBit().doubleValue();
-                        System.out.println(bitz/1e+6);
-                       // txtexpected.setText(Double.toString(bitz/1e+6));
-//
-                        txtactual.setText(df.format(bitz/1e+6)+" m/s");
-                        String variance = Double.toString(Double.parseDouble(df.format(Double.valueOf(price)*(Double.valueOf(speed) - (bitz/1e+6))   )));
-                        txtvariance.setText("$ " +variance);
+						Platform.runLater(new Runnable() {
+							@Override
+							public void run() {
+								final KeyFrame kf1 = new KeyFrame(Duration.seconds(0), e -> doFirstStuff());
+								final Timeline timeline = new Timeline(kf1);
+								DecimalFormat df = new DecimalFormat("#.####");
+								double bitz = report.getTransferRateBit().doubleValue();
+								System.out.println(bitz / 1e+6);
+								// txtexpected.setText(Double.toString(bitz/1e+6));
+		//
+								txtactual.setText(df.format(bitz / 1e+6) + " m/s");
+								String variance = Double.toString(Double.parseDouble(df.format(Double.valueOf(price) * (Double.valueOf(speed) - (bitz / 1e+6)))));
+								txtvariance.setText("$ " + variance);
+		//						try {
+		//							Thread.sleep(7000);
+		//						} catch (InterruptedException e) {
+		//							e.printStackTrace();
+		//						}
 
-                        //sending to data base with 10 sec delay
-						Reports report = new Reports();
-						report.Insert(variance,"date");
 
-                    }
-                });
+								Reports report = new Reports();
+								if (count < 200) {
+									report.Insert(variance, "date");
+								}
+								count++;
 
-                // called to notify download/upload progress
-                System.out.println("[PROGRESS] progress : " + percent + "%");
-                System.out.println("[PROGRESS] rate in octet/s : " + report.getTransferRateOctet());
-                System.out.println("[PROGRESS] rate in bit/s   : " + report.getTransferRateBit());
-            }
-        });
-        speedTestSocket.startDownload("http://ipv4.ikoula.testdebit.info/1M.iso", 1500);
+								System.out.println(count);
 
-        txtexpected.setText(speed+" mb/s");
-        //calculating variance
-        System.out.println(price);
+
+								//sending to data base with 10 sec delay
+		//						scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+		//						scheduledExecutorService.scheduleAtFixedRate(() -> {
+
+		//						}, 0, 30, TimeUnit.SECONDS);
+
+							}
+						});
+
+						// called to notify download/upload progress
+						System.out.println("[PROGRESS] progress : " + percent + "%");
+						System.out.println("[PROGRESS] rate in octet/s : " + report.getTransferRateOctet());
+						System.out.println("[PROGRESS] rate in bit/s   : " + report.getTransferRateBit());
+					}
+				});
+
+				speedTestSocket.startDownload("http://ipv4.ikoula.testdebit.info/1M.iso", 1500);
+
+				txtexpected.setText(speed + " mb/s");
+				//calculating variance
+				System.out.println(price);
+	}else{
+			System.out.println("could not delete");
+	}
 
     }
+
+	private void doFirstStuff() {
+	}
 
 
 	public synchronized void flitterChanged() {

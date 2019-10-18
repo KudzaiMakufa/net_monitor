@@ -43,7 +43,7 @@ public class GraphReport implements Initializable {
 //        final NumberAxis yAxis = new NumberAxis();
         xAxis.setLabel("Time/s");
         xAxis.setAnimated(false); // axis animations are removed
-        yAxis.setLabel("Speed");
+        yAxis.setLabel("Loss in Usd ");
         yAxis.setAnimated(false); // axis animations are removed
 
         //creating the line chart with two axis created above
