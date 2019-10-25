@@ -362,6 +362,7 @@ public class ControllerMain implements Initializable {
 					Parent root;
 					try {
 						URL dashboard = new File("src/main/resources/fxml/login.fxml").toURI().toURL();
+						UserSession.setMyVariable("");
 						root = FXMLLoader.load(dashboard);
 						Stage stage = new Stage();
 						stage.setTitle("Login");
@@ -541,8 +542,14 @@ public class ControllerMain implements Initializable {
 
 
 								Reports report = new Reports();
+
+								Date date = new Date();
+								SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+								String nowTime = format.format(date);
+
+
 								if (count < 200) {
-									report.Insert(variance, "date");
+									report.Insert(variance, nowTime);
 								}
 								count++;
 

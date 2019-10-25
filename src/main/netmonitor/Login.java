@@ -85,6 +85,7 @@ public class Login extends Application {
 
         }
         else if (user.Login(txtemail.getText().toString(), txtpassword.getText().toString()).equals("user")) {
+            UserSession.setMyVariable("user");
             Parent root;
             try {
                 URL dashboard = new File("src/main/resources/fxml/main.fxml").toURI().toURL();
