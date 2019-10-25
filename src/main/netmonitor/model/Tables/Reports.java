@@ -16,7 +16,7 @@ public class Reports {
             Class.forName("org.sqlite.JDBC");
             c = DriverManager.getConnection("jdbc:sqlite:netmonitor.db");
             c.setAutoCommit(false);
-            System.out.println("Opened database successfully");
+           // System.out.println("Opened database successfully");
             stmt = c.createStatement();
 
             String sql = "INSERT INTO Reports (ID,loss,time) " +
@@ -40,7 +40,7 @@ public class Reports {
             Class.forName("org.sqlite.JDBC");
             c = DriverManager.getConnection("jdbc:sqlite:netmonitor.db");
             c.setAutoCommit(false);
-            System.out.println("Opened database successfully");
+            //System.out.println("Opened database successfully");
             stmt = c.createStatement();
 
             String sql = "DELETE FROM Reports;";

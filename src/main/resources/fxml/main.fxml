@@ -34,6 +34,7 @@
               <items>
                 <MenuItem fx:id="AddUser" mnemonicParsing="false" text="Add User" />
                   <MenuItem fx:id="ViewUsers" mnemonicParsing="false" text="View Users" />
+
               </items>
             </Menu>
             <Menu mnemonicParsing="false" text="Graph Report">
@@ -73,8 +74,9 @@
       <Label layoutX="711.0" layoutY="290.0" text="Expected" />
       <Label layoutX="711.0" layoutY="320.0" text="Actual" />
       <Label layoutX="711.0" layoutY="350.0" text="Total loss" />
-      <Button fx:id="btncalculate" layoutX="763.0" layoutY="397.0" mnemonicParsing="false" onAction="#Calculate" text="Calculate" />
+      <Button fx:id="btncalculate" layoutX="713.0" layoutY="397.0" mnemonicParsing="false" onAction="#Calculate" text="Calculate" />
       <Label fx:id="txtactual" layoutX="825.0" layoutY="320.0" text="0" />
       <Label fx:id="txtvariance" layoutX="825.0" layoutY="350.0" text="0" />
+      <Button fx:id="logout" layoutX="830.0" layoutY="397.0" mnemonicParsing="false" text="Logout" />
    </children>
 </AnchorPane>

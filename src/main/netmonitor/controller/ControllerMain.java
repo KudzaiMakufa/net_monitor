@@ -77,6 +77,8 @@ public class ControllerMain implements Initializable {
 	@FXML
 	private MenuItem AddUser ;
 	@FXML
+	private Button logout ;
+	@FXML
 	private MenuItem graphreport ;
 
     @FXML Label txtexpected ;
@@ -293,7 +295,7 @@ public class ControllerMain implements Initializable {
 
 				if (snifferThread != null) {
 					try {
-						snifferThread.interrupted();
+						snifferThread.stop();
 					}catch(Exception e){
 
 					}finally{
@@ -352,6 +354,29 @@ public class ControllerMain implements Initializable {
 			}
 
 		});
+		//setting interface for logout
+
+		logout.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(javafx.event.ActionEvent event) {
+					Parent root;
+					try {
+						URL dashboard = new File("src/main/resources/fxml/login.fxml").toURI().toURL();
+						root = FXMLLoader.load(dashboard);
+						Stage stage = new Stage();
+						stage.setTitle("Login");
+						stage.setScene(new Scene(root, 600, 400));
+						stage.show();
+						// Hide this current window (if this is what you want)
+						//((Stage)(((Button)event.getSource()).getScene().getWindow())).close();
+						((Node) (event.getSource())).getScene().getWindow().hide();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+
+			}
+		});
+
 		//setting interface for adding user
 		AddUser.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -481,8 +506,8 @@ public class ControllerMain implements Initializable {
 					@Override
 					public void onCompletion(SpeedTestReport report) {
 						// called when download/upload is complete
-						System.out.println("[COMPLETED] rate in octet/s : " + report.getTransferRateOctet());
-						System.out.println("[COMPLETED] rate in bit/s   : " + report.getTransferRateBit());
+//						System.out.println("[COMPLETED] rate in octet/s : " + report.getTransferRateOctet());
+//						System.out.println("[COMPLETED] rate in bit/s   : " + report.getTransferRateBit());
 					}
 
 					@Override
@@ -502,7 +527,7 @@ public class ControllerMain implements Initializable {
 								final Timeline timeline = new Timeline(kf1);
 								DecimalFormat df = new DecimalFormat("#.####");
 								double bitz = report.getTransferRateBit().doubleValue();
-								System.out.println(bitz / 1e+6);
+								//System.out.println(bitz / 1e+6);
 								// txtexpected.setText(Double.toString(bitz/1e+6));
 		//
 								txtactual.setText(df.format(bitz / 1e+6) + " m/s");
@@ -521,7 +546,7 @@ public class ControllerMain implements Initializable {
 								}
 								count++;
 
-								System.out.println(count);
+								//System.out.println(count);
 
 
 								//sending to data base with 10 sec delay
@@ -534,9 +559,9 @@ public class ControllerMain implements Initializable {
 						});
 
 						// called to notify download/upload progress
-						System.out.println("[PROGRESS] progress : " + percent + "%");
-						System.out.println("[PROGRESS] rate in octet/s : " + report.getTransferRateOctet());
-						System.out.println("[PROGRESS] rate in bit/s   : " + report.getTransferRateBit());
+//						System.out.println("[PROGRESS] progress : " + percent + "%");
+//						System.out.println("[PROGRESS] rate in octet/s : " + report.getTransferRateOctet());
+//						System.out.println("[PROGRESS] rate in bit/s   : " + report.getTransferRateBit());
 					}
 				});
 
@@ -544,7 +569,7 @@ public class ControllerMain implements Initializable {
 
 				txtexpected.setText(speed + " mb/s");
 				//calculating variance
-				System.out.println(price);
+//				System.out.println(price);
 	}else{
 			System.out.println("could not delete");
 	}
@@ -667,11 +692,11 @@ public class ControllerMain implements Initializable {
 					dstMac.setTextAlignment(TextAlignment.CENTER);
 					Text length = new Text("\n" +
 							"length");
-					length.setWrappingWidth(30);
+					length.setWrappingWidth(60);
 					length.setTextAlignment(TextAlignment.CENTER);
 					Text prot = new Text("\n" +
 							"protocol");
-					prot.setWrappingWidth(40);
+					prot.setWrappingWidth(70);
 					prot.setTextAlignment(TextAlignment.CENTER);
 					Text time = new Text("\n" +
 							"time");
@@ -768,12 +793,12 @@ public class ControllerMain implements Initializable {
 		String nowTime = format.format(date);
 		System.out.println(nowTime);
 
-		File outPutDir = new File("D:\\MyCapturePacket");
+		File outPutDir = new File("/packets");
 		if (!outPutDir.exists()) {
 			outPutDir.mkdirs();
 		}
 		nowTime = nowTime.replaceAll(":", ".");
-		File outPutFile = new File("D:\\MyCapturePacket\\" + nowTime + ".txt");
+		File outPutFile = new File("packets " + nowTime + ".txt");
 		if (!outPutFile.exists()) {
 			try {
 				outPutFile.createNewFile();
